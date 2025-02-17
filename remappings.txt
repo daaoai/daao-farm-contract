@@ -1,0 +1,6 @@
+forge-std/=lib/forge-std/src/
+lib/openzeppelin-contracts/=lib/openzeppelin-contracts/
+src/DAOFarmFactory.sol/=src/DAOFarmFactory.sol/
+src/DAOFarm.sol/=src/DAOFarm.sol/
+ds-test/=lib/forge-std/lib/ds-test/src/
+openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/

@@ -120,7 +120,9 @@ contract DAOFarm is ReentrancyGuard, Ownable {
         uint256 balanceBefore = IERC20(depositToken).balanceOf(address(this));
         IERC20(depositToken).transferFrom(msg.sender, address(this), amount);
         _deposit(msg.sender, amount);
-        require(balanceBefore + amount >= IERC20(depositToken).balanceOf(address(this)), "Likely a fee on transfer error");
+        require(
+            balanceBefore + amount >= IERC20(depositToken).balanceOf(address(this)), "Likely a fee on transfer error"
+        );
     }
 
     function withdraw(uint256 amount) external virtual nonReentrant {

@@ -15,10 +15,10 @@ contract DAOFarmFactoryTest is Test {
     address public feeAddress;
     address public user1;
     address public user2;
-    
+
     MockERC20 public depositToken;
     MockERC20 public rewardsToken;
-    
+
     uint256 public constant INITIAL_SUPPLY = 1000000 * 1e18;
     uint256 public constant MAX_DEFAULT_FEE = 500; // 1%
 
@@ -62,13 +62,12 @@ contract DAOFarmFactoryTest is Test {
 
     // Test NitroPool creation
     function testCreateNitroPool() public {
-        DAOFarm.Settings memory settings = DAOFarm.Settings({
-            startTime: block.timestamp + 1 hours,
-            endTime: block.timestamp + 1 days
-        });
+        DAOFarm.Settings memory settings =
+            DAOFarm.Settings({startTime: block.timestamp + 1 hours, endTime: block.timestamp + 1 days});
 
-        address nitroPool = factory.createNitroPool(IERC20(address(depositToken)), IERC20(address(rewardsToken)), settings);
-        
+        address nitroPool =
+            factory.createNitroPool(IERC20(address(depositToken)), IERC20(address(rewardsToken)), settings);
+
         assertTrue(nitroPool != address(0), "NitroPool not created");
         assertEq(factory.nitroPoolsLength(), 1, "Wrong nitro pools count");
         assertEq(factory.getNitroPool(0), nitroPool, "Wrong nitro pool address");
@@ -79,10 +78,10 @@ contract DAOFarmFactoryTest is Test {
     // Test fee management
     function testSetDefaultFee() public {
         uint256 newFee = 300; // 0.6%
-        
+
         vm.expectEmit(true, false, false, true);
         emit SetDefaultFee(newFee);
-        
+
         factory.setDefaultFee(newFee);
         assertEq(factory.defaultFee(), newFee, "Wrong default fee");
     }
@@ -102,7 +101,7 @@ contract DAOFarmFactoryTest is Test {
     function testSetExemptedAddress() public {
         vm.expectEmit(true, false, false, true);
         emit SetExemptedAddress(user1, true);
-        
+
         factory.setExemptedAddress(user1, true);
         assertTrue(factory.isExemptedAddress(user1), "Address should be exempted");
         assertEq(factory.exemptedAddressesLength(), 1, "Wrong exempted addresses count");
@@ -111,7 +110,7 @@ contract DAOFarmFactoryTest is Test {
         // Test removing exempted address
         vm.expectEmit(true, false, false, true);
         emit SetExemptedAddress(user1, false);
-        
+
         factory.setExemptedAddress(user1, false);
         assertFalse(factory.isExemptedAddress(user1), "Address should not be exempted");
         assertEq(factory.exemptedAddressesLength(), 0, "Wrong exempted addresses count after removal");
@@ -131,10 +130,10 @@ contract DAOFarmFactoryTest is Test {
     // Test fee address management
     function testSetFeeAddress() public {
         address newFeeAddress = address(0x5);
-        
+
         vm.expectEmit(true, false, false, true);
         emit SetFeeAddress(newFeeAddress);
-        
+
         factory.setFeeAddress(newFeeAddress);
         assertEq(factory.feeAddress(), newFeeAddress, "Wrong fee address");
     }
@@ -153,10 +152,10 @@ contract DAOFarmFactoryTest is Test {
     // Test emergency recovery address management
     function testSetEmergencyRecoveryAddress() public {
         address newEmergencyAddress = address(0x6);
-        
+
         vm.expectEmit(true, false, false, true);
         emit SetEmergencyRecoveryAddress(newEmergencyAddress);
-        
+
         factory.setEmergencyRecoveryAddress(newEmergencyAddress);
         assertEq(factory.emergencyRecoveryAddress(), newEmergencyAddress, "Wrong emergency recovery address");
     }
@@ -179,11 +178,10 @@ contract DAOFarmFactoryTest is Test {
         factory.setDefaultFee(defaultFee);
 
         // Create a nitro pool
-        DAOFarm.Settings memory settings = DAOFarm.Settings({
-            startTime: block.timestamp + 1 hours,
-            endTime: block.timestamp + 1 days
-        });
-        address nitroPool = factory.createNitroPool(IERC20(address(depositToken)), IERC20(address(rewardsToken)), settings);
+        DAOFarm.Settings memory settings =
+            DAOFarm.Settings({startTime: block.timestamp + 1 hours, endTime: block.timestamp + 1 days});
+        address nitroPool =
+            factory.createNitroPool(IERC20(address(depositToken)), IERC20(address(rewardsToken)), settings);
 
         // Test regular fee
         assertEq(factory.getNitroPoolFee(nitroPool, owner), defaultFee, "Wrong fee for non-exempted address");
@@ -201,16 +199,15 @@ contract DAOFarmFactoryTest is Test {
     // Test NitroPool ownership transfer
     function testSetNitroPoolOwner() public {
         // Create a nitro pool
-        DAOFarm.Settings memory settings = DAOFarm.Settings({
-            startTime: block.timestamp + 1 hours,
-            endTime: block.timestamp + 1 days
-        });
-        address nitroPool = factory.createNitroPool(IERC20(address(depositToken)), IERC20(address(rewardsToken)), settings);
-        
+        DAOFarm.Settings memory settings =
+            DAOFarm.Settings({startTime: block.timestamp + 1 hours, endTime: block.timestamp + 1 days});
+        address nitroPool =
+            factory.createNitroPool(IERC20(address(depositToken)), IERC20(address(rewardsToken)), settings);
+
         // Transfer ownership
         DAOFarm pool = DAOFarm(nitroPool);
         pool.transferOwnership(user1);
-        
+
         // Verify ownership changes in factory
         assertEq(factory.ownerNitroPoolsLength(owner), 0, "Previous owner should have no pools");
         assertEq(factory.ownerNitroPoolsLength(user1), 1, "New owner should have one pool");
@@ -224,12 +221,11 @@ contract DAOFarmFactoryTest is Test {
 
     function testSetNitroPoolOwnerInvalidOwnerReverts() public {
         // Create a nitro pool
-        DAOFarm.Settings memory settings = DAOFarm.Settings({
-            startTime: block.timestamp + 1 hours,
-            endTime: block.timestamp + 1 days
-        });
-        address nitroPool = factory.createNitroPool(IERC20(address(depositToken)), IERC20(address(rewardsToken)), settings);
-        
+        DAOFarm.Settings memory settings =
+            DAOFarm.Settings({startTime: block.timestamp + 1 hours, endTime: block.timestamp + 1 days});
+        address nitroPool =
+            factory.createNitroPool(IERC20(address(depositToken)), IERC20(address(rewardsToken)), settings);
+
         // Try to transfer ownership with wrong previous owner
         vm.prank(nitroPool);
         vm.expectRevert("invalid owner");

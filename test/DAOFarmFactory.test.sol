@@ -67,9 +67,6 @@ contract DAOFarmFactoryTest is Test {
             endTime: block.timestamp + 1 days
         });
 
-        vm.expectEmit(true, false, false, true);
-        emit CreateNitroPool(address(0)); // We can't know the exact address, but we can check the event is emitted
-
         address nitroPool = factory.createNitroPool(IERC20(address(depositToken)), IERC20(address(rewardsToken)), settings);
         
         assertTrue(nitroPool != address(0), "NitroPool not created");

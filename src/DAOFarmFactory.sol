@@ -116,6 +116,7 @@ contract DAOFarmFactory is Ownable, IDAOFarmFactory {
     function createNitroPool(IERC20 depositToken, IERC20 rewardsToken1, DAOFarm.Settings calldata settings)
         external
         virtual
+        onlyOwner
         returns (address nitroPool)
     {
         // Initialize new nitro pool

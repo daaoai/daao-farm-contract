@@ -31,3 +31,6 @@ contract DeployFarmFactoryScript is Script {
 //   --verify \
 //   --verifier blockscout \
 //   --verifier-url https://explorer.mode.network/api/
+
+
+// forge verify-contract --rpc-url https://mainnet.mode.network/ 0x1a66EDB7058134798CBA6dbA91EFf98A84A7c6a8 ./src/DAOFarm.sol:DAOFarm --verifier blockscout --verifier-url https://explorer.mode.network/api

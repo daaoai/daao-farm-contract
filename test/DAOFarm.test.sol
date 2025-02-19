@@ -329,7 +329,7 @@ contract DAOFarmTest is Test {
     // Test withdraw functionality
     function testWithdraw() public {
         // Setup initial deposit
-        (uint256 startTime,) = farm.settings();
+        (uint256 startTime, uint256 endTime) = farm.settings();
         vm.warp(startTime);
         vm.prank(user1);
         farm.deposit(USER_DEPOSIT);
@@ -341,6 +341,7 @@ contract DAOFarmTest is Test {
         uint256 rewardsBalanceBefore = rewardsToken.balanceOf(user1);
         uint256 depositBalanceBefore = depositToken.balanceOf(user1);
 
+        vm.warp(endTime);
         vm.prank(user1);
         farm.withdraw(USER_DEPOSIT);
 
@@ -353,11 +354,12 @@ contract DAOFarmTest is Test {
     }
 
     function testWithdrawTooMuchReverts() public {
-        (uint256 startTime,) = farm.settings();
+        (uint256 startTime, uint256 endTime) = farm.settings();
         vm.warp(startTime);
         vm.prank(user1);
         farm.deposit(USER_DEPOSIT);
 
+        vm.warp(endTime);
         vm.expectRevert("Withdrawing too much");
         vm.prank(user1);
         farm.withdraw(USER_DEPOSIT + 1);
@@ -502,7 +504,7 @@ contract DAOFarmTest is Test {
     function testPendingRewardsAfterPartialWithdraw() public {
         farm.addRewards(REWARDS_AMOUNT);
 
-        (uint256 startTime,) = farm.settings();
+        (uint256 startTime, uint256 endTime) = farm.settings();
         vm.warp(startTime);
 
         // User deposits
@@ -510,17 +512,15 @@ contract DAOFarmTest is Test {
         farm.deposit(USER_DEPOSIT);
 
         // Move forward 6 hours
-        vm.warp(startTime + 6 hours);
+        vm.warp(endTime);
 
         // Partial withdraw
         vm.prank(user1);
         farm.withdraw(USER_DEPOSIT / 2);
 
-        // Move forward another 6 hours
-        vm.warp(startTime + 12 hours);
 
         uint256 pending = farm.pendingRewards(user1);
-        assertTrue(pending > 0, "Should have pending rewards after partial withdraw");
+        assertTrue(pending == 0, "Should not have pending rewards after partial withdraw");
     }
 
     // ====== ADD REWARDS TESTS ======
@@ -715,7 +715,7 @@ contract DAOFarmTest is Test {
     // ====== WITHDRAW TESTS ======
 
     function testWithdrawBasic() public {
-        (uint256 startTime,) = farm.settings();
+        (uint256 startTime, uint256 endTime) = farm.settings();
         vm.warp(startTime);
 
         // Initial deposit
@@ -727,6 +727,7 @@ contract DAOFarmTest is Test {
         vm.expectEmit(true, false, false, true);
         emit Withdraw(user1, USER_DEPOSIT);
 
+        vm.warp(endTime);
         vm.prank(user1);
         farm.withdraw(USER_DEPOSIT);
 
@@ -740,7 +741,7 @@ contract DAOFarmTest is Test {
     }
 
     function testWithdrawPartial() public {
-        (uint256 startTime,) = farm.settings();
+        (uint256 startTime, uint256 endTime) = farm.settings();
         vm.warp(startTime);
 
         // Initial deposit
@@ -750,6 +751,7 @@ contract DAOFarmTest is Test {
         uint256 withdrawAmount = USER_DEPOSIT / 2;
         uint256 balanceBefore = depositToken.balanceOf(user1);
 
+        vm.warp(endTime);
         vm.prank(user1);
         farm.withdraw(withdrawAmount);
 
@@ -765,7 +767,7 @@ contract DAOFarmTest is Test {
     function testWithdrawWithPendingRewards() public {
         farm.addRewards(REWARDS_AMOUNT);
 
-        (uint256 startTime,) = farm.settings();
+        (uint256 startTime, uint256 endTime) = farm.settings();
         vm.warp(startTime);
 
         // Initial deposit
@@ -773,7 +775,7 @@ contract DAOFarmTest is Test {
         farm.deposit(USER_DEPOSIT);
 
         // Move forward to accumulate rewards
-        vm.warp(startTime + 12 hours);
+        vm.warp(endTime);
 
         uint256 pendingBefore = farm.pendingRewards(user1);
         uint256 rewardsBalanceBefore = rewardsToken.balanceOf(user1);
@@ -934,7 +936,7 @@ contract DAOFarmTest is Test {
         // 1. Add initial rewards
         farm.addRewards(REWARDS_AMOUNT);
 
-        (uint256 startTime,) = farm.settings();
+        (uint256 startTime, uint256 endTime) = farm.settings();
         vm.warp(startTime);
 
         // 2. Users deposit
@@ -958,7 +960,8 @@ contract DAOFarmTest is Test {
         uint256 user2Rewards = rewardsToken.balanceOf(user2) - user2BalanceBefore;
 
         // 5. More time passes
-        vm.warp(startTime + 12 hours);
+        vm.warp(endTime);
+
 
         // 6. User withdraws (should get rewards too)
         uint256 user1BalanceAfter = rewardsToken.balanceOf(user1);

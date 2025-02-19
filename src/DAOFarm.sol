@@ -126,6 +126,7 @@ contract DAOFarm is ReentrancyGuard, Ownable {
     }
 
     function withdraw(uint256 amount) external virtual nonReentrant {
+        require(_currentBlockTimestamp() >= settings.endTime, "pool is active");
         _updatePool();
         UserInfo storage user = userInfo[msg.sender];
         require(user.totalDepositAmount >= amount, "Withdrawing too much");

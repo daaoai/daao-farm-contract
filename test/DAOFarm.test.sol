@@ -518,7 +518,6 @@ contract DAOFarmTest is Test {
         vm.prank(user1);
         farm.withdraw(USER_DEPOSIT / 2);
 
-
         uint256 pending = farm.pendingRewards(user1);
         assertTrue(pending == 0, "Should not have pending rewards after partial withdraw");
     }
@@ -961,7 +960,6 @@ contract DAOFarmTest is Test {
 
         // 5. More time passes
         vm.warp(endTime);
-
 
         // 6. User withdraws (should get rewards too)
         uint256 user1BalanceAfter = rewardsToken.balanceOf(user1);
